@@ -25,8 +25,15 @@ A simple and beautiful task management app built with **React Native** and **Exp
 
 ---
 
-## 📲 Screenshots
+## 📸 Screenshots
 
+<p align="center">
+  <img src="https://github.com/DEveL0perLuckY/MyTasksApp/blob/main/img2.jpeg?raw=true" width="250" alt="Task App Screenshot" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/DEveL0perLuckY/MyTasksApp/blob/main/img.jpeg?raw=true" width="250" alt="Task App Screenshot" />
+</p>
 
 ---
 
