@@ -67,7 +67,7 @@ npx expo run:ios
 
 ## 📲 Download APK
 
-👉 [Click here to download the APK](https://drive.google.com/file/d/1UvT38oktde5-Xo1BGq8yD2B5uZecz2Jf/view?usp=sharing)
+👉 [Click here to download the APK](https://drive.google.com/file/d/1Y7HAs0BRSu5Z1Zveb0hQsxZYOlOyakfG/view?usp=sharing)
 
 ## 📦 Dependencies
 
