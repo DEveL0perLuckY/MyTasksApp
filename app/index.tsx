@@ -1,4 +1,3 @@
-// app/index.tsx
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,6 +15,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 
 Notifications.setNotificationHandler({
@@ -29,6 +29,7 @@ Notifications.setNotificationHandler({
 });
 
 export type Priority = "high" | "medium" | "low";
+
 export interface Task {
   id: string;
   text: string;
@@ -46,46 +47,49 @@ export default function TaskManager() {
   const [editText, setEditText] = useState("");
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(-50));
+  const [loading, setLoading] = useState(true);
 
-  // Theme colors
   const theme = {
     background: colorScheme === "dark" ? "#121212" : "#F7F9FC",
     card: colorScheme === "dark" ? "#1F1F1F" : "#FFFFFF",
     text: colorScheme === "dark" ? "#FFFFFF" : "#2D3748",
     secondaryText: colorScheme === "dark" ? "#A0AEC0" : "#718096",
     border: colorScheme === "dark" ? "#2D3748" : "#E2E8F0",
-    primary: "#6366F1", // Indigo
-    success: "#10B981", // Emerald
-    danger: "#EF4444", // Red
-    highPriority: "#F87171", // Red-400
-    mediumPriority: "#FBBF24", // Amber-400
-    lowPriority: "#34D399", // Green-400
+    primary: "#6366F1",
+    success: "#10B981",
+    danger: "#EF4444",
+    highPriority: "#F87171",
+    mediumPriority: "#FBBF24",
+    lowPriority: "#34D399",
     inputBg: colorScheme === "dark" ? "#2D2D2D" : "#EDF2F7",
   };
 
-  // Load tasks from storage
   useEffect(() => {
-    const loadTasks = async () => {
+    const initialize = async () => {
       try {
         const savedTasks = await AsyncStorage.getItem("tasks");
         if (savedTasks) {
-          setTasks(JSON.parse(savedTasks));
-          // Animate when tasks load
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }).start();
+          const parsedTasks = JSON.parse(savedTasks);
+          setTasks(parsedTasks);
         }
       } catch (error) {
         console.error("Failed to load tasks", error);
+      } finally {
+        setLoading(false);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
       }
-    };
 
-    loadTasks();
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
 
-    // Request notification permissions
-    (async () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -93,31 +97,19 @@ export default function TaskManager() {
           "Enable notifications for task reminders"
         );
       }
-    })();
-
-    // Slide animation for header
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 500,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  // Save tasks to storage
-  useEffect(() => {
-    const saveTasks = async () => {
-      try {
-        await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
-      } catch (error) {
-        console.error("Failed to save tasks", error);
-      }
     };
 
-    saveTasks();
-  }, [tasks]);
+    initialize();
+  }, []);
 
-  // Schedule notification for new task
+  useEffect(() => {
+    if (!loading) {
+      AsyncStorage.setItem("tasks", JSON.stringify(tasks)).catch((error) =>
+        console.error("Failed to save tasks", error)
+      );
+    }
+  }, [tasks, loading]);
+
   const scheduleNotification = async (taskId: string, taskText: string) => {
     try {
       const notificationId = await Notifications.scheduleNotificationAsync({
@@ -126,9 +118,8 @@ export default function TaskManager() {
           body: `Time to complete: ${taskText}`,
           data: { taskId },
         },
-        trigger: { seconds: 10 }, // 10 seconds for testing
+        trigger: { seconds: 10 },
       });
-
       return notificationId;
     } catch (error) {
       console.error("Failed to schedule notification", error);
@@ -136,12 +127,10 @@ export default function TaskManager() {
     }
   };
 
-  // Cancel notification
   const cancelNotification = async (notificationId: string) => {
     await Notifications.cancelScheduledNotificationAsync(notificationId);
   };
 
-  // Add new task
   const addTask = async () => {
     if (!newTask.trim()) return;
 
@@ -153,7 +142,6 @@ export default function TaskManager() {
       notificationId: null,
     };
 
-    // Schedule notification
     const notificationId = await scheduleNotification(
       newTaskObj.id,
       newTaskObj.text
@@ -166,19 +154,15 @@ export default function TaskManager() {
     Keyboard.dismiss();
   };
 
-  // Toggle task completion
   const toggleTask = async (id: string) => {
     setTasks((prev) =>
       prev.map((task) => {
         if (task.id === id) {
           const updatedTask = { ...task, completed: !task.completed };
-
-          // Cancel notification when marked complete
           if (updatedTask.completed && task.notificationId) {
             cancelNotification(task.notificationId);
             updatedTask.notificationId = null;
           }
-
           return updatedTask;
         }
         return task;
@@ -186,33 +170,26 @@ export default function TaskManager() {
     );
   };
 
-  // Delete task
   const deleteTask = (id: string) => {
-    // Animation for deletion
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
       const task = tasks.find((t) => t.id === id);
-
-      // Cancel notification if exists
       if (task?.notificationId) {
         cancelNotification(task.notificationId);
       }
-
       setTasks((prev) => prev.filter((task) => task.id !== id));
       fadeAnim.setValue(1);
     });
   };
 
-  // Start editing task
   const startEditing = (task: Task) => {
     setEditingId(task.id);
     setEditText(task.text);
   };
 
-  // Save edited task
   const saveEdit = () => {
     if (!editingId || !editText.trim()) return;
 
@@ -226,7 +203,6 @@ export default function TaskManager() {
     setEditText("");
   };
 
-  // Priority color mapping
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "high":
@@ -240,7 +216,6 @@ export default function TaskManager() {
     }
   };
 
-  // Priority label mapping
   const getPriorityLabel = (priority: Priority) => {
     switch (priority) {
       case "high":
@@ -254,7 +229,6 @@ export default function TaskManager() {
     }
   };
 
-  // Render task item
   const renderItem = ({ item }: { item: Task }) => (
     <Animated.View
       style={[
@@ -271,14 +245,6 @@ export default function TaskManager() {
               }),
             },
           ],
-          shadowColor: colorScheme === "dark" ? "#000" : "#6366F1",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: colorScheme === "dark" ? 0.1 : 0.05,
-          shadowRadius: 4,
-          elevation: 2,
         },
       ]}
     >
@@ -380,6 +346,26 @@ export default function TaskManager() {
       </View>
     </Animated.View>
   );
+
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.background,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={{ color: theme.secondaryText, marginTop: 12 }}>
+          Loading tasks...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
