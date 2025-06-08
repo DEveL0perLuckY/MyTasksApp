@@ -1,51 +1,109 @@
-# Welcome to your Expo app 👋
+# 📋 Task Manager App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple and beautiful task management app built with **React Native** and **Expo**, supporting task creation, editing, priority tagging, and local push notifications for reminders.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Features
 
-   ```bash
-   npm install
-   ```
+- Add, edit, and delete tasks with ease
+- Set task priorities: High 🔴, Medium 🟡, Low 🟢
+- Schedule local notifications for tasks
+- Visual task completion tracking with checkboxes
+- Offline support using AsyncStorage
+- Beautiful, clean, and responsive UI
+- Dark mode support
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🛠️ Tech Stack
 
-In the output, you'll find options to open the app in a
+- **Framework**: React Native with Expo
+- **Notifications**: `expo-notifications`
+- **Storage**: `@react-native-async-storage/async-storage`
+- **Icons**: `@expo/vector-icons` (Ionicons)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📲 Screenshots
 
-## Get a fresh project
 
-When you're ready, run:
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/yourusername/task-manager-app.git
+cd task-manager-app
+````
+
+### 2. Install dependencies
+
+```bash
+npm install
+# or
+yarn
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 3. Start the development server
 
-## Learn more
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+> ⚠️ This app uses **local notifications**. Make sure to test it on a **real device** using a **Development Build**, as **Expo Go does not support `expo-notifications` in SDK 53+**.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 4. Create a development build (if needed)
 
-## Join the community
+```bash
+npx expo run:android
+# or
+npx expo run:ios
+```
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# MyTasksApp
+## 📲 Download APK
+
+👉 [Click here to download the APK](https://drive.google.com/file/d/1UvT38oktde5-Xo1BGq8yD2B5uZecz2Jf/view?usp=sharing)
+
+## 📦 Dependencies
+
+* `expo`
+* `react-native`
+* `expo-notifications`
+* `@react-native-async-storage/async-storage`
+* `@expo/vector-icons`
+* `react-navigation` (if used)
+
+---
+
+## 📝 Project Structure
+
+```bash
+.
+├── app/
+│   └── index.tsx         # Main App component
+├── hooks/
+│   └── useColorScheme.ts # Handles light/dark mode
+├── assets/               # Images, icons (optional)
+├── README.md
+└── package.json
+```
+
+---
+
+## 🙌 Author
+
+**Lucky Mourya**
+🌐 [developerlucky.in](https://developerlucky.in)
+📧 [luckymourya52132@gmail.com](mailto:luckymourya52132@gmail.com)
+💼 [LinkedIn](https://linkedin.com/in/lucky-mourya-968b6126b)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
